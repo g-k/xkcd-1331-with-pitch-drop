@@ -4,16 +4,42 @@ ClojureScript version of [xkcd 1331: Frequency](http://xkcd.com/1331/) with the 
 
 ![xkcd 1331 pitch drop](xkcd-screen.png?raw=true "xkcd 1331 pitch drop")
 
-#### Notes
+#### TODO
 
-Project to learn a bit about core.async.
+- [ ] The pitch drop (the only feature) is blinking way too fast. 
+   * `window.setTimeout` returns immediately on Chrome 35 and Firefox 29.0.1:
 
-The pitch drop blinking is actually way too fast.  This problem is
-apparently due to a bug in the CLJS core.async timeout implementation
-where timeouts larger than the internal skiplist size execute
-immediately instead of at the longest possible internal (but I haven't
-dug into it too deeply yet). This is kind of great.
+```
+> window.setTimeout(function () { console.log("done"); }, Math.pow(2, 31))
+2
+done
+> window.setTimeout(function () { console.log("done"); }, Math.pow(2, 31) - 1)
+3
+```
 
-The page leaks memory on Chrome 35. This is kind of terrible.
+   * `setTimeout` is [defined in the HTML5 spec not the ECMAScript spec](http://stackoverflow.com/questions/8852198/settimeout-if-not-defined-in-ecmascript-spec-where-can-i-learn-how-it-works) 
 
-Overlapping blinking blocks when resized. Sigh.
+   * MDN notes:
+
+> Browsers including Internet Explorer, Chrome, Safari, and Firefox store the delay as a 32-bit signed Integer internally. This causes an Integer overflow when using delays larger than 2147483647, resulting in the timeout being executed immediately.
+
+https://developer.mozilla.org/en-US/docs/Web/API/window.setTimeout#Minimum.2F_maximum_delay_and_timeout_nesting
+
+  which checks out:
+   
+```
+> (Math.pow(2, 31) - 1).toString(16)
+"7fffffff"
+> (Math.pow(2, 31)).toString(16)
+"80000000"
+```
+  
+  but is kind of weird considering JS Numbers are 64-bit IEEE 754 floating point:
+
+```
+> Number.MAX_SAFE_INTEGER.toString(16)
+"1fffffffffffff"
+```
+
+- [ ] slowish memory leak on Chrome 35 (other browsers untested)
+- [ ] overlapping blinking blocks when resized
