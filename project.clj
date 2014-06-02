@@ -12,10 +12,17 @@
   :source-paths ["src"]
 
   :cljsbuild {
-    :builds [{:id "pitch_dropper"
-              :source-paths ["src"]
-              :compiler {
-                :output-to "pitch_dropper.js"
-                :output-dir "out"
-                :optimizations :none
-                :source-map true}}]})
+              :builds [{:id "dev"
+                        :source-paths ["src"]
+                        :compiler {
+                                   :output-to "pitch_dropper.js"
+                                   :output-dir "out"
+                                   :optimizations :none
+                                   :source-map true}}
+                       {:id "prod"
+                        :source-paths ["src"]
+                        :compiler {
+                                   :output-to "pitch_dropper.min.js"
+                                   :optimizations :advanced
+                                   }}
+                       ]})
