@@ -15,3 +15,5 @@ immediately instead of at the longest possible internal (but I haven't
 dug into it too deeply yet). This is kind of great.
 
 The page leaks memory on Chrome 35. This is kind of terrible.
+
+Overlapping blinking blocks when resized. Sigh.
