@@ -24,5 +24,6 @@
                         :compiler {
                                    :output-to "pitch_dropper.min.js"
                                    :optimizations :advanced
+                                   :pretty-print false
                                    }}
                        ]})
