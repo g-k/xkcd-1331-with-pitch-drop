@@ -2,7 +2,7 @@ ClojureScript version of [xkcd 1331: Frequency](http://xkcd.com/1331/) with the 
 
 #### Screenshot
 
-
+![xkcd 1331 pitch drop](xkcd-screen.png?raw=true "xkcd 1331 pitch drop")
 
 #### Notes
 
