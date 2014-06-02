@@ -1,6 +1,6 @@
 (defproject hello-world "0.1.0-SNAPSHOT"
   :description "xkcd 1331: Frequency with Pitch Drop CLJS Experiment"
-  :url "http://g-k.github.io/pitch-dropper"
+  :url "https://github.com/g-k/xkcd-1331-with-pitch-drop"
 
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2227"]
