@@ -4,9 +4,11 @@
    [dommy.core :as dommy]
    [cljs.core.async
     :as async
-    :refer [<! >! chan put! timeout]])
-  (:require-macros [cljs.core.async.macros :refer [go]])
+    :refer [<! >! chan close! timeout]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:use-macros [dommy.macros :only [node sel sel1]]))
+
+(enable-console-print!)
 
 (defn log [& args] (. js/console (log (str args))))
 (defn mean [& xs] (/ (apply + xs) (count xs)))
@@ -107,49 +109,47 @@
 (defn toggle-style
   "Toggles style on element"
   [[class-name property value]]
-  ;; (log class-name property value)
   (dommy/set-style! (sel1 (str "." class-name)) property value))
 
 (def events (chan))  ; a stream of [class-name action value] events
 (def dimmed-opacity 0.4)
 (def undimmed-opacity 1.0)
 
-;; timer testing
-(enable-console-print!)
+(def MAX_TIMEOUT (. js/Math pow 2 31))
 
-(defn long-timeout-test
+(defn long-timeout
+  "Call timeout with MAX_TIMEOUT to handle signed 32-bit int overflow in setTimeout. Note that this can decrease the accuracy by the resolution times the number of timeouts that it needs to be split into."
   [msecs]
-  (go
-    (println "timeout with:" msecs)
-    (let [start (. js/performance now)
-          _ (<! (timeout msecs))
-          end (. js/performance now)
-          elapsed (- end start)]
-      (println "elapsed:" elapsed msecs (- msecs elapsed))
-      )))
+  (let [done (chan)]
+    (go
+      (loop [ms msecs]
+        (<! (timeout ms))
+        (if (> ms MAX_TIMEOUT)
+          (recur (- ms MAX_TIMEOUT))
+          (close! done))))
+    done))
 
 
 (defn toggle-with-frequency
   [[class-name text frequency :as item]]
   (let [frequency-in-ms (seconds-to-ms frequency)
         undim-duration (min (* 0.2 frequency-in-ms) 1000)
-        dim-duration (- frequency-in-ms undim-duration)]
-
-    (log class-name undim-duration dim-duration)
-
-    (go (loop [i 0]
-          (<! (timeout frequency-in-ms))
-          (when (< i 5)
-            (recur (inc i)))))
+        dim-duration (- frequency-in-ms undim-duration)
+        long-duration (> (max undim-duration dim-duration) MAX_TIMEOUT)
+        timeout-fn (if long-duration
+                     long-timeout
+                     timeout)
+        ]
+    ;; (println class-name undim-duration dim-duration long-duration)
 
     (go (loop []
           ;; blocks until nil emitted at timeout
 
           (>! events [class-name "opacity" dimmed-opacity])
-          (<! (timeout dim-duration))
+          (<! (timeout-fn dim-duration))
 
           (>! events [class-name "opacity" undimmed-opacity])
-          (<! (timeout undim-duration))
+          (<! (timeout-fn undim-duration))
 
           (recur)))))
 

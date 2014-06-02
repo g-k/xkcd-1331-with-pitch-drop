@@ -6,7 +6,7 @@ ClojureScript version of [xkcd 1331: Frequency](http://xkcd.com/1331/) with the 
 
 #### TODO
 
-- [ ] The pitch drop (the only feature) is blinking way too fast. 
+- [x] The pitch drop (the only feature) is blinking way too fast.
    * `window.setTimeout` returns immediately on Chrome 35 and Firefox 29.0.1:
 
 ```
@@ -17,7 +17,7 @@ done
 3
 ```
 
-   * `setTimeout` is [defined in the HTML5 spec not the ECMAScript spec](http://stackoverflow.com/questions/8852198/settimeout-if-not-defined-in-ecmascript-spec-where-can-i-learn-how-it-works) 
+   * `setTimeout` is [defined in the HTML5 spec not the ECMAScript spec](http://stackoverflow.com/questions/8852198/settimeout-if-not-defined-in-ecmascript-spec-where-can-i-learn-how-it-works)
 
    * MDN notes:
 
@@ -26,14 +26,14 @@ done
 https://developer.mozilla.org/en-US/docs/Web/API/window.setTimeout#Minimum.2F_maximum_delay_and_timeout_nesting
 
   which checks out:
-   
+
 ```
 > (Math.pow(2, 31) - 1).toString(16)
 "7fffffff"
 > (Math.pow(2, 31)).toString(16)
 "80000000"
 ```
-  
+
   but is kind of weird considering JS Numbers are 64-bit IEEE 754 floating point:
 
 ```
